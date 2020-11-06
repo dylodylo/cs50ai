@@ -143,8 +143,6 @@ def minimax(board):
 
     if terminal(board):
         return None
-
-    print(player(board))
     if player(board) == X:
         v = -math.inf
         for action in actions(board):
@@ -157,9 +155,7 @@ def minimax(board):
         v = math.inf
         for action in actions(board):
             min_v = maxvalue(result(board,action))
-            print(min_v, v)
             if min_v < v:
-                print("jestem tu")
                 v = min_v
                 best_action = action
     
