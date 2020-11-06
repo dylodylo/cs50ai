@@ -43,12 +43,10 @@ def actions(board):
     """
     actions = []
     for i in range(len(board[0])):
-        print('--',i)
         for j in range(len(board)):
             if board[i][j] == EMPTY:
                 actions.append((i,j))
 
-    print(actions)
     return actions
     raise NotImplementedError
 
@@ -57,20 +55,15 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    try:
+    if terminal(board):
+        raise ValueError("Game over.")
+    elif action not in actions(board):
+        raise ValueError("Invalid action", action, board)
+    else:
         new_board = copy.deepcopy(board)
-        #print(new_board)
-        print("----")
-        print(action[0],action[1])
-        print(new_board[0][1])
-        print(player(board))
-        print("-----")
         new_board[action[0]][action[1]] = player(board)
-        return new_board
-        raise NameError
-    except NameError:
-        print("Error!")
-
+    
+    return new_board
 
     raise NotImplementedError
 
@@ -81,21 +74,36 @@ def winner(board):
     """
     for i in board:
         if i == ["X", "X", "X"]:
-            return "X"
+            return X
         elif i == ["O", "O", "O"]:
-            return "O"
-        elif board[0][0] == board[1][0] == board[2][0]:
-            return board[0][0]
-        elif board[0][1] == board[1][1] == board[2][1]:
-            return board [0][1]
-        elif board[0][2] == board[1][2] == board[2][2]:
-            return board [0][2]
-        elif board[0][0] == board[1][1] == board[2][2]:
-            return board [0][0]
-        elif board[0][2] == board[1][1] == board[2][0]:
-            return board [0][2]
+            return O
+    if board[0][0] == board[1][0] == board[2][0]!= None:
+        if board[0][0] == "X":
+            return X
         else:
-            return None
+            return O
+    elif board[0][1] == board[1][1] == board[2][1]!= None:
+        if board[0][1] == "X":
+            return X
+        else:
+            return O
+    elif board[0][2] == board[1][2] == board[2][2]!= None:
+        if board[0][2] == "X":
+            return X
+        else:
+            return O
+    elif board[0][0] == board[1][1] == board[2][2]!= None:
+        if board[0][0] == "X":
+            return X
+        else:
+            return O
+    elif board[0][2] == board[1][1] == board[2][0]!= None:
+        if board[0][2] == "X":
+            return X
+        else:
+            return O
+    else:
+        return None
             
     raise NotImplementedError
 
@@ -118,10 +126,10 @@ def utility(board):
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
     if terminal(board):
-        winner = winner(board)
-        if winner == "X":
+        winner_ = winner(board)
+        if winner_ == X:
             return 1
-        elif winner == "O":
+        elif winner_ == O:
             return -1
         else:
             return 0
@@ -133,11 +141,47 @@ def minimax(board):
     Returns the optimal action for the current player on the board.
     """
 
-    actions_ = actions(board)
-    # for action in actions_:
-    #     if winner(result(board, action)):
-    #         pass
+    if terminal(board):
+        return None
+
+    print(player(board))
+    if player(board) == X:
+        v = -math.inf
+        for action in actions(board):
+            max_v = minvalue(result(board,action))
+            if max_v > v:
+                v = max_v
+                best_action = action
+        
+    elif player(board) == O:
+        v = math.inf
+        for action in actions(board):
+            min_v = maxvalue(result(board,action))
+            print(min_v, v)
+            if min_v < v:
+                print("jestem tu")
+                v = min_v
+                best_action = action
     
+    return best_action
+
+
+def maxvalue(board):
+    if terminal(board):
+        return utility(board)
+
+    v = -math.inf
+    for action in actions(board):
+        v = max(v, minvalue(result(board, action)))
+    return v
+
+
+def minvalue(board):
+    if terminal(board):
+        return utility(board)
     
-    return actions_[0]
-    raise NotImplementedError
+    v = math.inf
+    for action in actions(board):
+        v = min(v, maxvalue(result(board, action)))
+
+    return v
